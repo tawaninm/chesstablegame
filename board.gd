@@ -105,8 +105,8 @@ func display_board():
 		for j in BOARD_SIZE:
 			var holder = TEXTURE_HOLDER.instantiate()
 			pieces.add_child(holder)
-			holder.global_position = Vector2(j * CELL_WIDTH + (CELL_WIDTH/2), -i * CELL_WIDTH - (CELL_WIDTH/2))
-			
+			holder.global_position = Vector2(j * CELL_WIDTH + (CELL_WIDTH / 2), -i * CELL_WIDTH - (CELL_WIDTH / 2))
+
 			match board[i][j]:
 				-6 : holder.texture = BLACK_KING
 				-5 : holder.texture = BLACK_QUEEN
@@ -121,8 +121,10 @@ func display_board():
 				3 : holder.texture = WHITE_BISHOP
 				2 : holder.texture = WHITE_KNIGHT
 				1 : holder.texture = WHITE_PAWN
+
 	if white:turn.texture = TURN_WHITE
 	else: turn.texture = TURN_BLACK
+
 func show_options():
 	moves = get_moves()
 	if moves == []:
@@ -135,7 +137,7 @@ func show_dots():
 		var holder = TEXTURE_HOLDER.instantiate()
 		dots.add_child(holder)
 		holder.texture = PIECE_MOVE
-		holder.global_position = Vector2(i.y * CELL_WIDTH + (CELL_WIDTH /2 ), -i.x * CELL_WIDTH - (CELL_WIDTH /2 ))
+		holder.global_position = Vector2(i.y * CELL_WIDTH + (CELL_WIDTH / 2), -i.x * CELL_WIDTH - (CELL_WIDTH / 2))
 
 func delete_dots():
 	for child in dots.get_children():
