@@ -202,8 +202,8 @@ func set_move(var2, var1):
 			white = !white
 			display_board()
 			break
-		delete_dots()
-		state = false
+	delete_dots()
+	state = false
 
 func get_moves():
 	var _moves = []
