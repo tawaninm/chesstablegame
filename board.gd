@@ -269,7 +269,7 @@ func get_bishop_moves(piece_position : Vector2):
 				board[pos.x][pos.y] = 3 if white else -3
 				board[piece_position.x][piece_position.y] = 0
 				if white && !is_in_check(white_king_pos) || !white && !is_in_check(black_king_pos) : _moves.append(pos)
-				board[pos.x][pos.y] = 0
+				board[pos.x][pos.y] = t
 				board[piece_position.x][piece_position.y] = 3 if white else -3
 				break
 			else: break
@@ -297,7 +297,7 @@ func get_queen_moves(piece_position : Vector2):
 				board[pos.x][pos.y] = 5 if white else -5
 				board[piece_position.x][piece_position.y] = 0
 				if white && !is_in_check(white_king_pos) || !white && !is_in_check(black_king_pos) : _moves.append(pos)
-				board[pos.x][pos.y] = 0
+				board[pos.x][pos.y] = t
 				board[piece_position.x][piece_position.y] = 5 if white else -5
 				break
 			else: break
