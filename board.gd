@@ -28,6 +28,10 @@ const PIECE_MOVE = preload("res://Assets/Piece_move.png")
 @onready var turn = $Turn
 @onready var white_pieces: Control = $"../CanvasLayer/white_pieces"
 @onready var black_pieces: Control = $"../CanvasLayer/Black_pieces"
+@onready var timer_player_1: Timer = $"../TimerPlayer1"
+@onready var timer_player_2: Timer = $"../TimerPlayer2"
+@onready var white_timelabel: Label = $"../WhiteTimelabel"
+@onready var black_timelabel: Label = $"../BlackTimelabel"
 
 #Variables
 # -6 = black king
@@ -63,6 +67,17 @@ var en_passant = null
 var white_king_pos = Vector2(0,4)
 var black_king_pos = Vector2(7,4)
 
+var fifty_move_rule = 0
+
+var unique_board_moves : Array = []
+var amount_of_same : Array = []
+
+var intial_time = 300.0
+var increment = 10.0
+var white_time = intial_time
+var black_time = intial_time
+var white_turn = true
+
 func _ready():
 	board.append([4, 2, 3, 5, 6, 3, 2, 4])
 	board.append([1, 1, 1, 1, 1, 1, 1, 1])
@@ -84,6 +99,14 @@ func _ready():
 	for button in black_button:
 		button.pressed.connect(self._on_button_pressed.bind(button))
 
+func _process(delta: float) -> void:
+	if white_turn:
+		white_time -= delta
+	else :
+		black_time -= delta
+	update_timer_display()
+	check_time()
+
 func _input(event):
 	if event is InputEventMouseButton && event.pressed && promotion_square == null:
 		if event.button_index == MOUSE_BUTTON_LEFT:
@@ -97,8 +120,8 @@ func _input(event):
 			elif state: set_move(var2,var1)
 
 func is_mouse_out():
-	if get_global_mouse_position().x < 0 || get_global_mouse_position().x > 144 || get_global_mouse_position().y > 0 || get_global_mouse_position().y < -144 : return true
-	return false
+	if get_rect().has_point(to_local(get_global_mouse_position())) : return false
+	return true
 
 func display_board():
 	for child in pieces.get_children():
@@ -149,9 +172,12 @@ func delete_dots():
 func set_move(var2, var1):
 	var just_now = false
 	for i in moves:
+		fifty_move_rule += 1
+		if is_enemy(Vector2(var1, var2)) : fifty_move_rule = 0
 		if i.x == var2 && i.y == var1:
 			match board[seleted_piece.x][seleted_piece.y]:
 				1:
+					fifty_move_rule = 0
 					if i.x == 7:promote(i)
 					if i.x == 3 && seleted_piece.x == 1:
 						en_passant = i
@@ -160,6 +186,7 @@ func set_move(var2, var1):
 						if en_passant.y == i.y && seleted_piece.y != i.y && en_passant.x == seleted_piece.x:
 							board[en_passant.x][en_passant.y] = 0
 				-1:
+					fifty_move_rule = 0
 					if i.x == 0:promote(i)
 					if i.x == 4 && seleted_piece.x == 6:
 						en_passant = i
@@ -205,10 +232,23 @@ func set_move(var2, var1):
 			board[var2][var1] = board[seleted_piece.x][seleted_piece.y]
 			board[seleted_piece.x][seleted_piece.y] = 0
 			white = !white
+			threefold_position(board)
 			display_board()
+			switch_turn()
 			break
 	delete_dots()
 	state = false
+	
+	if (seleted_piece.x != var2 || seleted_piece.y != var1)  && (white && board[var1][var2] > 0 || !white && board[var1][var2] < 0):
+		seleted_piece = Vector2(var1,var2)
+		show_options()
+		state = true
+	elif is_stalemate():
+		if white && is_in_check(white_king_pos) || !white && is_in_check(black_king_pos) : print("Checkmate")
+		else : print("DRAW")
+		
+	if fifty_move_rule == 0 : print("DRAW")
+	elif insuficient_material():print("DRAW")
 
 func get_moves(selected : Vector2):
 	var _moves = []
@@ -489,3 +529,85 @@ func is_in_check(king_pos: Vector2):
 				return true
 				
 	return false
+
+func is_stalemate():
+	if white:
+		for i in BOARD_SIZE:
+			for j in BOARD_SIZE:
+				if board[i][j] > 0:
+					if get_moves(Vector2(i,j)) != [] : return false
+
+	else :
+		for i in BOARD_SIZE:
+			for j in BOARD_SIZE:
+				if board[i][j] < 0:
+					if get_moves(Vector2(i,j)) != [] : return false
+	return true
+
+func insuficient_material():
+	var white_pieces = 0
+	var black_pieces = 0
+	
+	for i in BOARD_SIZE:
+		for j in BOARD_SIZE:
+			match  board[i][j]:
+				2 ,3:
+					if white_pieces == 0 : white_pieces += 1
+					else : return false
+				-2,-3:
+					if black_pieces == 0 : black_pieces += 1
+					else : return false
+				6,-6,0: pass
+				_: #4 -4 1 -1 -5 5
+					return false
+	return true
+
+func threefold_position(var1 :Array):
+	for i in unique_board_moves.size():
+		if var1 == unique_board_moves[i]:
+			amount_of_same[i] += 1
+			if amount_of_same[i] >= 3: print("Draw")
+			return
+	unique_board_moves.append(var1.duplicate(true))
+	amount_of_same.append(1)
+
+func start_timer():
+	if white_turn:
+		timer_player_1.start(1)
+		timer_player_2.stop()
+	else:
+		timer_player_2.start(1)
+		timer_player_1.stop()
+
+func stop_timer():
+	timer_player_1.stop()
+	timer_player_2.stop()
+
+func update_timer_display():
+	white_timelabel.text = format_time(white_time)
+	black_timelabel.text = format_time(black_time)
+
+func format_time(time:float) -> String:
+	var minutes = int(time) / 60
+	var seconds = int(time) % 60
+	return "%02d:%02d" % [minutes,seconds]
+
+func switch_turn():
+	white_turn = !white_turn
+	if white_turn:
+		white_time += increment
+	else:
+		black_time += increment
+	start_timer()
+
+func check_time():
+	if white_time <= 0:
+		print("white time out!")
+		game_over()
+	if black_time <= 0:
+		print("black time out!")
+		game_over()
+
+func game_over():
+	stop_timer()
+	print("End game")

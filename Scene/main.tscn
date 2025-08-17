@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://cu220wndyc2w7"]
+[gd_scene load_steps=37 format=3 uid="uid://cu220wndyc2w7"]
 
 [ext_resource type="Texture2D" uid="uid://x755sgv08iqn" path="res://Assets/white_knight.png" id="1_afvo0"]
 [ext_resource type="PackedScene" uid="uid://de52yk71ds7e0" path="res://Scene/board.tscn" id="1_fqmb0"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://wb8dh1iq8p42" path="res://Assets/black_bishop.png" id="6_q8862"]
 [ext_resource type="Texture2D" uid="uid://u3t1oc0kb6qc" path="res://Assets/black_rook.png" id="7_qg4iq"]
 [ext_resource type="Texture2D" uid="uid://cln2v60x46uqw" path="res://Assets/black_queen.png" id="8_kxq1q"]
+[ext_resource type="FontFile" uid="uid://bgx24tdux1tbq" path="res://Font/Jersey M54.ttf" id="10_wnorj"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kb0qm"]
 
@@ -87,6 +88,7 @@ texture = ExtResource("8_kxq1q")
 texture = ExtResource("8_kxq1q")
 
 [node name="Main" type="Node2D"]
+metadata/_edit_group_ = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(73, -73)
@@ -212,3 +214,33 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_x5gpt")
 
 [node name="Board" parent="." instance=ExtResource("1_fqmb0")]
 position = Vector2(72, -72)
+
+[node name="TimerPlayer1" type="Timer" parent="."]
+
+[node name="TimerPlayer2" type="Timer" parent="."]
+
+[node name="WhiteTimelabel" type="Label" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -29.0
+offset_right = 50.0
+offset_bottom = 20.0
+grow_vertical = 0
+rotation = -1.5708
+scale = Vector2(0.5, 0.5)
+theme_override_fonts/font = ExtResource("10_wnorj")
+theme_override_font_sizes/font_size = 35
+text = "0.00"
+
+[node name="BlackTimelabel" type="Label" parent="."]
+offset_left = -20.0
+offset_top = -84.0
+offset_right = 50.0
+offset_bottom = -35.0
+rotation = -1.5708
+scale = Vector2(0.5, 0.5)
+theme_override_fonts/font = ExtResource("10_wnorj")
+theme_override_font_sizes/font_size = 35
+text = "0.00"
