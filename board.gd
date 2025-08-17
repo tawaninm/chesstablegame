@@ -452,7 +452,7 @@ func get_pawn_moves(piece_position : Vector2):
 			if white && !is_in_check(white_king_pos) || !white && !is_in_check(black_king_pos): _moves.append(pos)
 			board[pos.x][pos.y] = t
 			board[piece_position.x][piece_position.y] = 1 if white else -1
-		
+	#Move position
 	pos = piece_position + direction * 2
 	if is_first_move && is_empty(pos) && is_empty(piece_position + direction):
 		board[pos.x][pos.y] = 1 if white else -1
